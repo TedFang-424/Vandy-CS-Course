@@ -1,0 +1,118 @@
+import streamlit as st
+from langchain import LLMChain
+from langchain.chat_models import ChatOpenAI
+from langchain.prompts.chat import (ChatPromptTemplate,
+                                    HumanMessagePromptTemplate,
+                                    SystemMessagePromptTemplate)
+from langchain.document_loaders import *
+from langchain.chains.summarize import load_summarize_chain
+import tempfile
+from langchain.docstore.document import Document
+
+st.title('Vandy Gym Real Time')
+
+def webPageLayoutGenerator():
+    chat = ChatOpenAI(
+        model="gpt-3.5-turbo-16k",
+        temperature=0
+    )
+    system_template = """You are a web designer tasked with creating a layout for a web page."""
+    system_message_prompt = SystemMessagePromptTemplate.from_template(system_template)
+    human_template = """Please generate a layout for the web page as per the given instruction."""
+    human_message_prompt = HumanMessagePromptTemplate.from_template(human_template)
+    chat_prompt = ChatPromptTemplate.from_messages(
+        [system_message_prompt, human_message_prompt]
+    )
+
+    chain = LLMChain(llm=chat, prompt=chat_prompt)
+    result = chain.run({})
+    return result
+
+def display_layout(layout):
+    if layout != "":
+        st.markdown(layout)
+
+def webPageDesigner(confirmation_layout):
+    chat = ChatOpenAI(
+        model="gpt-3.5-turbo-16k",
+        temperature=0
+    )
+    system_template = """You are a web designer tasked with generating the upper half of a web page with facilities information."""
+    system_message_prompt = SystemMessagePromptTemplate.from_template(system_template)
+    human_template = """Please design the upper half of the web page based on the following layout: {confirmation_layout}."""
+    human_message_prompt = HumanMessagePromptTemplate.from_template(human_template)
+    chat_prompt = ChatPromptTemplate.from_messages(
+        [system_message_prompt, human_message_prompt]
+    )
+
+    chain = LLMChain(llm=chat, prompt=chat_prompt)
+    result = chain.run(confirmation_layout=confirmation_layout)
+    return result
+
+def display_upper_half(upper_half):
+    if upper_half != "":
+        st.markdown(f"**Upper Half of the Web Page:**\n{upper_half}")
+
+def display_lower_half(lower_half):
+    if lower_half != "":
+        st.markdown(f"**Lower Half of the Web Page:**\n{lower_half}")
+
+def updateButtonGenerator(confirmation_layout):
+    chat = ChatOpenAI(
+        model="gpt-3.5-turbo-16k",
+        temperature=0
+    )
+    system_template = """You are a software assistant tasked with generating an 'Update' button for real-time information update."""
+    system_message_prompt = SystemMessagePromptTemplate.from_template(system_template)
+    human_template = """Please generate the 'Update' button for the following confirmation layout: {confirmation_layout}."""
+    human_message_prompt = HumanMessagePromptTemplate.from_template(human_template)
+    chat_prompt = ChatPromptTemplate.from_messages(
+        [system_message_prompt, human_message_prompt]
+    )
+
+    chain = LLMChain(llm=chat, prompt=chat_prompt)
+    result = chain.run(confirmation_layout=confirmation_layout)
+    return result
+
+def display_update_button(update_button):
+    if update_button != "":
+        st.markdown(f"**Update Button:**\n{update_button}")
+
+def webDesignFinalizer(confirmation_final):
+    chat = ChatOpenAI(
+        model="gpt-3.5-turbo-16k",
+        temperature=0
+    )
+    system_template = """You are a web designer and your task is to finalize the design of a web page."""
+    system_message_prompt = SystemMessagePromptTemplate.from_template(system_template)
+    human_template = """The client has confirmed the final design: {confirmation_final}. Please finalize the web page design."""
+    human_message_prompt = HumanMessagePromptTemplate.from_template(human_template)
+    chat_prompt = ChatPromptTemplate.from_messages(
+        [system_message_prompt, human_message_prompt]
+    )
+
+    chain = LLMChain(llm=chat, prompt=chat_prompt)
+    result = chain.run(confirmation_final=confirmation_final)
+    return result
+
+def display_final_design(final_design):
+    if final_design != "":
+        st.markdown(f"**Final Design of the Web Page:**\n{final_design}")
+
+if st.button('Generate Layout'):
+    layout = webPageLayoutGenerator()
+    display_layout(layout)
+
+confirmation_layout = st.text_input("Please confirm the layout by typing 'yes' or 'no'")
+if confirmation_layout:
+    upper_half = webPageDesigner(confirmation_layout)
+    display_upper_half(upper_half)
+    lower_half = webPageDesigner(confirmation_layout)
+    display_lower_half(lower_half)
+    update_button = updateButtonGenerator(confirmation_layout)
+    display_update_button(update_button)
+
+confirmation_final = st.text_input("Please confirm the final design by typing 'yes' or 'no'")
+if confirmation_final:
+    final_design = webDesignFinalizer(confirmation_final)
+    display_final_design(final_design)
